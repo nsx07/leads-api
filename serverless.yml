@@ -1,6 +1,5 @@
-# "org" ensures this Service is used with the correct Serverless Framework Access Key.
 org: nsx07
-service: serverless-example
+service: leads-api
 
 plugins:
   - serverless-offline
