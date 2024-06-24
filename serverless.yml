@@ -3,9 +3,18 @@ service: leads-api
 
 plugins:
   - serverless-offline
+  - serverless-dynamodb-local
+
 provider:
   name: aws
   runtime: nodejs18.x
+
+  environment:
+    iamRoleStatements: ${file(iam/leadsTableIAM.yml)}
+
+resources:
+  Resources:
+    leadsTable: ${file(resources/leadsTable.yml):leadsTable}
 
 functions:
   main:

@@ -19,7 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "serverless:offline": "sls offline start",
-    "serverless:deploy": "sls deploy"
+    "serverless:deploy": "build && sls deploy"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -28,7 +28,8 @@
     "@vendia/serverless-express": "^4.12.6",
     "aws-lambda": "^1.0.7",
     "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "serverless-dynamodb-local": "^0.2.40"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

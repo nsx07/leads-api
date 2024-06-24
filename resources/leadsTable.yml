@@ -1,0 +1,25 @@
+leadsTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    TableName: leadsTable
+    AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+
+    KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+    BillingMode: PAY_PER_REQUEST
+    # GlobalSecondaryIndexes:
+    #   - IndexName: email_index
+    #     KeySchema:
+    #       - AttributeName: email
+    #         KeyType: HASH
+    #     Projection:
+    #       ProjectionType: ALL
+    #   - IndexName: phone_index
+    #     KeySchema:
+    #       - AttributeName: phone
+    #         KeyType: HASH
+    #     Projection:
+    #       ProjectionType: ALL
