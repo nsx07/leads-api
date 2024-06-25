@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
 
+declare var process: any;
+
 @Injectable()
 export class Dynamo {
   context: any;
@@ -10,13 +12,15 @@ export class Dynamo {
   }
 
   private getContext() {
-    // if (process.env.IS_OFFLINE === 'true') {
-    //   return new AWS.DynamoDB.DocumentClient({
-    //     region: 'localhost',
-    //     endpoint: process.env.DYNAMODB_ENDPOINT,
-    //   });
-    // } else {
+    if (process.env.IS_OFFLINE) {
+      const { region, accessKeyId, secretAccessKey } = process.env;
+      return new AWS.DynamoDB.DocumentClient({
+        region: region,
+        accessKeyId: accessKeyId,
+        secretAccessKey: secretAccessKey,
+      });
+
+    }
     return new AWS.DynamoDB.DocumentClient();
-    // }
   }
 }

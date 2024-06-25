@@ -19,7 +19,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "serverless:offline": "sls offline start",
-    "serverless:deploy": "build && sls deploy"
+    "serverless:dynamo": "sls dynamodb start",
+    "serverless:deploy": "npm run build && sls deploy"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -38,7 +39,7 @@
     "@types/aws-lambda": "^8.10.140",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
-    "@types/node": "^20.3.1",
+    "@types/node": "^20.14.8",
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
@@ -47,6 +48,7 @@
     "eslint-plugin-prettier": "^5.0.0",
     "jest": "^29.5.0",
     "prettier": "^3.0.0",
+    "serverless-dotenv-plugin": "^6.0.0",
     "serverless-offline": "^13.6.0",
     "source-map-support": "^0.5.21",
     "supertest": "^6.3.3",

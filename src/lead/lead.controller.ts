@@ -12,6 +12,11 @@ export class LeadController {
     return this.service.createLead(dto);
   }
 
+  @Post('setupManyChat')
+  async setupManyChat(@Body() lead: Lead) {
+    return this.service.setupManyChat(lead);
+  }
+
   @Get(':id')
   async getLeadById(@Param('id') id: string) {
     return this.service.getLeadById(id);

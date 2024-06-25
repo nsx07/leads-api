@@ -1,20 +1,30 @@
 org: nsx07
 service: leads-api
+useDotenv: true
 
 plugins:
-  - serverless-offline
-  - serverless-dynamodb-local
+  - serverless-dotenv-plugin
 
 provider:
   name: aws
   runtime: nodejs18.x
+  region: us-east-1
 
   environment:
-    iamRoleStatements: ${file(iam/leadsTableIAM.yml)}
+    MANY_CHAT_URL: ${env:MANY_CHAT_URL}
+    MANY_CHAT_TOKEN: ${env:MANY_CHAT_TOKEN}
 
-resources:
-  Resources:
-    leadsTable: ${file(resources/leadsTable.yml):leadsTable}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - { "Fn::GetAtt": ["lead", "Arn" ] }
 
 functions:
   main:
@@ -26,3 +36,20 @@ functions:
       - http:
           method: ANY
           path: '{proxy+}'
+          cors: true
+
+resources:
+  Resources:
+    lead:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: lead
+        AttributeDefinitions:
+          - AttributeName: phone
+            AttributeType: S
+        KeySchema:
+          - AttributeName: phone
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
