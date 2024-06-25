@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NestMiddleware } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NestMiddleware,
+} from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 
 @Injectable()
@@ -8,8 +12,8 @@ export class AuthMiddleware implements NestMiddleware {
     next();
   }
 
-  private validateToken(token: string) {
-    const [bearer, value] = token.split(' ');
+  private validateToken(token?: string) {
+    const [bearer, value] = token?.split(' ');
 
     if (bearer !== 'Bearer') {
       throw new BadRequestException('Invalid token');
@@ -17,17 +21,15 @@ export class AuthMiddleware implements NestMiddleware {
 
     const valueDecoded = Buffer.from(value, 'base64').toString('utf-8');
 
-    if (!valueDecoded || !valueDecoded.includes("number42")) {
-        throw new BadRequestException('Invalid token');
+    if (!valueDecoded || !valueDecoded.includes('number42')) {
+      throw new BadRequestException('Invalid token');
     }
 
-    const dateMilis = +valueDecoded.split('-number42')[0]
     const maxTime = new Date().getTime() - 1000 * 60 * 60 * 3;
+    const dateMilis = +valueDecoded.split('-number42')[0];
 
     if (dateMilis < maxTime) {
-        throw new BadRequestException('Invalid token');
+      throw new BadRequestException('Invalid token');
     }
-
-
   }
 }
