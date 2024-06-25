@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
 
-declare var process: any;
+declare const process: any;
 
 @Injectable()
 export class Dynamo {
@@ -19,7 +19,6 @@ export class Dynamo {
         accessKeyId: accessKeyId,
         secretAccessKey: secretAccessKey,
       });
-
     }
     return new AWS.DynamoDB.DocumentClient();
   }

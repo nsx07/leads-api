@@ -25,7 +25,9 @@ export class Lead {
     }
 
     phoneClean = phoneClean.slice(i);
-    
+
+    console.log(phoneClean, phoneClean.length);
+
     if (phoneClean.length === 11) {
       return `55${phoneClean}`;
     } else {

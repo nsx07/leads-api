@@ -17,13 +17,12 @@ export class LeadService {
     const lead = {
       id: uuid(),
       ...dto,
+      phone: Lead.cleanAndValidatePhone(dto.phone),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
-    const validPhone = await this.getLeadById(
-      Lead.cleanAndValidatePhone(lead.phone),
-    );
+    const validPhone = await this.getLeadById(lead.phone);
 
     if (validPhone) {
       throw new BadRequestException('Phone already exists');
@@ -37,8 +36,7 @@ export class LeadService {
         })
         .promise();
 
-      await this.setupManyChat(lead);
-      return lead;
+      return { lead, ...(await this.setupManyChat(lead)) };
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
@@ -74,9 +72,9 @@ export class LeadService {
   async setupManyChat(lead: Lead) {
     const body = {
       first_name: lead.name.split(' ')[0],
-      last_name: lead.name.split(' ')[1],
-      phone: Lead.cleanAndValidatePhone(lead.phone),
-      whatsapp_phone: Lead.cleanAndValidatePhone(lead.phone),
+      last_name: lead.name.split(' ').slice(1).join(' '),
+      phone: lead.phone,
+      whatsapp_phone: lead.phone,
       email: lead.email,
       gender: 'string',
       has_opt_in_sms: true,
@@ -84,29 +82,47 @@ export class LeadService {
       consent_phrase: 'string',
     };
 
-    const response = await fetch(process.env.MANY_CHAT_URL, {
+    const response = await fetch(
+      process.env.MANY_CHAT_URL + 'createSubscriber',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.MANY_CHAT_TOKEN}`,
+        },
+        body: JSON.stringify(body),
+      },
+    )
+      .then((res) => res.json())
+      .catch((err) => err);
+
+    if (
+      (response.status == 'error' || response instanceof Error) &&
+      !response?.details?.messages?.whatsapp_phone?.message?.includes(
+        'WhatsApp subscriber with this phone number already exists',
+      )
+    ) {
+      throw new BadRequestException(response);
+    }
+
+    const responseTag = await this.authorizeLead(response.data.id);
+
+    return { response, responseTag };
+  }
+
+  private async authorizeLead(subscriber_id: string) {
+    return await fetch(`${process.env.MANY_CHAT_URL}addTag`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${process.env.MANY_CHAT_TOKEN}`,
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        tag_id: '45440271',
+        subscriber_id: subscriber_id,
+      }),
     })
       .then((res) => res.json())
       .catch((err) => err);
-
-    if (response.status == 'error') {
-      if (
-        response?.details?.messages?.whatsapp_phone?.message?.includes(
-          'WhatsApp subscriber with this phone number already exists',
-        )
-      ) {
-        return response;
-      }
-
-      throw new BadRequestException(response.error);
-    }
-
-    return response;
   }
 }
